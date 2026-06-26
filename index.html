@@ -62,64 +62,137 @@
     display:flex;align-items:center;justify-content:center;
   }
 
-  /* ============ FAB — Living Light Orb ============ */
+  /* ============ FAB — Living Intelligence Orb ============ */
   .fab{
     position:fixed;bottom:30px;left:30px;
-    width:56px;height:56px;border-radius:50%;
-    background:rgba(6,8,15,.7);
-    border:1px solid rgba(0,229,255,.15);
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    width:60px;height:60px;border-radius:50%;
+    background:transparent;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
     z-index:100;
-    transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+    transition:transform .4s cubic-bezier(.34,1.56,.64,1);
     overflow:visible;
   }
-  .fab:hover{transform:scale(1.06)}
-  .fab:active{transform:scale(.98)}
+  .fab:hover{transform:scale(1.08)}
+  .fab:active{transform:scale(.95)}
 
-  /* Orb core — the living light */
-  .fab-orb{
-    position:absolute;inset:6px;border-radius:50%;
-    background:radial-gradient(circle at 40% 40%, rgba(0,229,255,.5), rgba(0,229,255,.1) 60%, transparent 80%);
-    animation:orbBreathe 3s ease-in-out infinite;
+  /* Outer halo — soft breathing glow */
+  .fab-halo{
+    position:absolute;inset:-6px;border-radius:50%;
+    background:radial-gradient(circle, rgba(0,229,255,.18) 0%, rgba(139,92,246,.06) 40%, transparent 70%);
+    animation:haloBreathe 4s ease-in-out infinite;
+    filter:blur(3px);pointer-events:none;
   }
-  @keyframes orbBreathe{
-    0%,100%{opacity:.5;transform:scale(.85);filter:blur(2px)}
-    50%{opacity:1;transform:scale(1.1);filter:blur(0px)}
+  @keyframes haloBreathe{
+    0%,100%{opacity:.5;transform:scale(1)}
+    50%{opacity:.85;transform:scale(1.18)}
   }
 
-  /* Wave rings — expand outward like ripples */
+  /* Expanding light waves — fade in/out sequence */
+  .fab-waves{position:absolute;inset:0;pointer-events:none}
   .fab-wave{
     position:absolute;inset:0;border-radius:50%;
-    border:1.5px solid rgba(0,229,255,.3);
-    animation:wave 3s ease-out infinite;
-    pointer-events:none;
+    border:1px solid rgba(0,229,255,.5);
+    animation:waveFade 3.2s cubic-bezier(.4,0,.2,1) infinite;
   }
-  .fab-wave:nth-child(2){animation-delay:1s}
-  .fab-wave:nth-child(3){animation-delay:2s}
-  @keyframes wave{
-    0%{transform:scale(.6);opacity:0;border-width:2px}
-    20%{opacity:.5}
-    100%{transform:scale(1.8);opacity:0;border-width:.5px}
+  .fab-wave:nth-child(1){animation-delay:0s}
+  .fab-wave:nth-child(2){animation-delay:.8s}
+  .fab-wave:nth-child(3){animation-delay:1.6s}
+  .fab-wave:nth-child(4){animation-delay:2.4s}
+  @keyframes waveFade{
+    0%{transform:scale(.55);opacity:0;border-width:1.5px;border-color:rgba(0,229,255,.65)}
+    12%{opacity:.85}
+    45%{opacity:.35;border-color:rgba(0,229,255,.3)}
+    100%{transform:scale(2);opacity:0;border-width:.2px;border-color:rgba(0,229,255,.05)}
   }
 
-  /* Inner glow */
-  .fab-glow{
-    position:absolute;inset:0;border-radius:50%;
-    box-shadow:0 0 20px rgba(0,229,255,.15);
-    animation:glowPulse 3s ease-in-out infinite;
+  /* The Intelligence Orb — 3D sphere look */
+  .fab-orb{
+    position:relative;
+    width:44px;height:44px;border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 30%, rgba(255,255,255,.55) 0%, transparent 28%),
+      radial-gradient(circle at 50% 50%, rgba(0,229,255,.35) 0%, rgba(0,160,200,.18) 45%, rgba(6,8,15,.95) 100%);
+    box-shadow:
+      inset 0 0 12px rgba(0,229,255,.35),
+      inset 0 1px 2px rgba(255,255,255,.18),
+      0 0 18px rgba(0,229,255,.22),
+      0 2px 8px rgba(0,0,0,.4);
+    overflow:hidden;
+    animation:orbPulse 4s ease-in-out infinite;
   }
-  @keyframes glowPulse{
-    0%,100%{box-shadow:0 0 15px rgba(0,229,255,.1)}
-    50%{box-shadow:0 0 25px rgba(0,229,255,.25), 0 0 50px rgba(0,229,255,.08)}
+  @keyframes orbPulse{
+    0%,100%{
+      box-shadow:
+        inset 0 0 12px rgba(0,229,255,.35),
+        inset 0 1px 2px rgba(255,255,255,.18),
+        0 0 18px rgba(0,229,255,.22),
+        0 2px 8px rgba(0,0,0,.4);
+    }
+    50%{
+      box-shadow:
+        inset 0 0 16px rgba(0,229,255,.55),
+        inset 0 1px 2px rgba(255,255,255,.22),
+        0 0 28px rgba(0,229,255,.4),
+        0 2px 8px rgba(0,0,0,.4);
+    }
+  }
+
+  /* Rotating "thinking" arc — conic gradient masked to ring */
+  .fab-think{
+    position:absolute;inset:3px;border-radius:50%;
+    background:conic-gradient(
+      from 0deg,
+      transparent 0%,
+      transparent 55%,
+      rgba(0,229,255,.5) 75%,
+      rgba(255,255,255,.9) 92%,
+      transparent 100%
+    );
+    -webkit-mask:radial-gradient(circle, transparent 58%, black 60%, black 92%, transparent 94%);
+    mask:radial-gradient(circle, transparent 58%, black 60%, black 92%, transparent 94%);
+    animation:thinkRotate 3s linear infinite;
+  }
+  @keyframes thinkRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  /* Orbiting micro-particles */
+  .fab-particle{
+    position:absolute;top:50%;left:50%;
+    width:2.5px;height:2.5px;border-radius:50%;
+    background:rgba(180,240,255,.95);
+    box-shadow:0 0 5px rgba(0,229,255,.9);
+  }
+  .fab-particle:nth-child(1){animation:orbit1 5s linear infinite}
+  .fab-particle:nth-child(2){animation:orbit2 7s linear infinite;animation-delay:-2s}
+  @keyframes orbit1{
+    from{transform:translate(-50%,-50%) rotate(0deg) translateX(19px) rotate(0deg)}
+    to{transform:translate(-50%,-50%) rotate(360deg) translateX(19px) rotate(-360deg)}
+  }
+  @keyframes orbit2{
+    from{transform:translate(-50%,-50%) rotate(180deg) translateX(17px) rotate(-180deg)}
+    to{transform:translate(-50%,-50%) rotate(540deg) translateX(17px) rotate(-540deg)}
+  }
+
+  /* Center spark — flickering nucleus */
+  .fab-spark{
+    position:absolute;top:50%;left:50%;
+    width:5px;height:5px;border-radius:50%;
+    background:rgba(255,255,255,.95);
+    box-shadow:0 0 8px rgba(255,255,255,.85), 0 0 16px rgba(0,229,255,.7);
+    transform:translate(-50%,-50%);
+    animation:sparkFlicker 2.2s ease-in-out infinite;
+  }
+  @keyframes sparkFlicker{
+    0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.75)}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}
   }
 
   /* Online dot */
-  .fab.online{
-    position:absolute;top:3px;right:3px;
+  .fab .online{
+    position:absolute;top:2px;right:2px;
     width:10px;height:10px;border-radius:50%;
     background:var(--green);
     border:2px solid var(--bg-0);
-    box-shadow:0 0 6px rgba(34,197,94,.5);
+    box-shadow:0 0 6px rgba(34,197,94,.6);
     z-index:5;
   }
   .fab.hidden{transform:scale(0);opacity:0;pointer-events:none}
@@ -168,6 +241,89 @@
     display:flex;align-items:center;justify-content:center;
     flex-shrink:0;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+    position:relative;
+    overflow:visible;
+  }
+
+  /* Intelligence Orb in header (V513) — small version */
+  .hdr-av-orb{
+    background:transparent;
+    border:none;
+    box-shadow:none;
+    overflow:visible;
+  }
+  .hdr-orb-root{
+    position:relative;width:100%;height:100%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .hdr-orb-halo{
+    position:absolute;inset:-8px;border-radius:50%;
+    background:radial-gradient(circle, rgba(0,229,255,.22) 0%, rgba(139,92,246,.08) 40%, transparent 70%);
+    animation:hdr-halo-breathe 4s ease-in-out infinite;
+    filter:blur(2px);pointer-events:none;
+  }
+  @keyframes hdr-halo-breathe{
+    0%,100%{opacity:.5;transform:scale(1)}
+    50%{opacity:.85;transform:scale(1.2)}
+  }
+  .hdr-orb-waves{position:absolute;inset:0;pointer-events:none}
+  .hdr-orb-wave{
+    position:absolute;inset:0;border-radius:50%;
+    border:1px solid rgba(0,229,255,.5);
+    animation:hdr-wave-fade 3.2s cubic-bezier(.4,0,.2,1) infinite;
+  }
+  .hdr-orb-wave:nth-child(1){animation-delay:0s}
+  .hdr-orb-wave:nth-child(2){animation-delay:.8s}
+  .hdr-orb-wave:nth-child(3){animation-delay:1.6s}
+  .hdr-orb-wave:nth-child(4){animation-delay:2.4s}
+  @keyframes hdr-wave-fade{
+    0%{transform:scale(.6);opacity:0;border-width:1.2px;border-color:rgba(0,229,255,.6)}
+    12%{opacity:.8}
+    45%{opacity:.3;border-color:rgba(0,229,255,.25)}
+    100%{transform:scale(1.7);opacity:0;border-width:.2px;border-color:rgba(0,229,255,.05)}
+  }
+  .hdr-orb-core{
+    position:relative;width:80%;height:80%;border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 30%, rgba(255,255,255,.55) 0%, transparent 28%),
+      radial-gradient(circle at 50% 50%, rgba(0,229,255,.4) 0%, rgba(0,160,200,.2) 45%, rgba(6,8,15,.95) 100%);
+    box-shadow:
+      inset 0 0 10px rgba(0,229,255,.4),
+      inset 0 1px 2px rgba(255,255,255,.2),
+      0 0 14px rgba(0,229,255,.25);
+    overflow:hidden;
+    animation:hdr-orb-pulse 4s ease-in-out infinite;
+  }
+  @keyframes hdr-orb-pulse{
+    0%,100%{box-shadow:inset 0 0 10px rgba(0,229,255,.4),inset 0 1px 2px rgba(255,255,255,.2),0 0 14px rgba(0,229,255,.25)}
+    50%{box-shadow:inset 0 0 14px rgba(0,229,255,.6),inset 0 1px 2px rgba(255,255,255,.25),0 0 22px rgba(0,229,255,.45)}
+  }
+  .hdr-orb-think{
+    position:absolute;inset:6%;border-radius:50%;
+    background:conic-gradient(
+      from 0deg,
+      transparent 0%,
+      transparent 55%,
+      rgba(0,229,255,.5) 75%,
+      rgba(255,255,255,.9) 92%,
+      transparent 100%
+    );
+    -webkit-mask:radial-gradient(circle, transparent 58%, black 60%, black 92%, transparent 94%);
+    mask:radial-gradient(circle, transparent 58%, black 60%, black 92%, transparent 94%);
+    animation:hdr-think-rotate 3s linear infinite;
+  }
+  @keyframes hdr-think-rotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  .hdr-orb-spark{
+    position:absolute;top:50%;left:50%;
+    width:10%;height:10%;min-width:3px;min-height:3px;border-radius:50%;
+    background:rgba(255,255,255,.95);
+    box-shadow:0 0 6px rgba(255,255,255,.85), 0 0 12px rgba(0,229,255,.7);
+    transform:translate(-50%,-50%);
+    animation:hdr-spark-flicker 2.2s ease-in-out infinite;
+  }
+  @keyframes hdr-spark-flicker{
+    0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.75)}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}
   }
   .hdr-meta{min-width:0;line-height:1.2}
   .hdr-name{font-size:13px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:6px}
@@ -478,14 +634,33 @@
 
 <div class="stage">
 
-  <!-- ============ FAB ============ -->
+  <!-- ============ FAB — Living Intelligence Orb ============ -->
   <button class="fab" id="fab" aria-label="فتح المساعد">
     <span class="online"></span>
-    <div class="fab-wave"></div>
-    <div class="fab-wave"></div>
-    <div class="fab-wave"></div>
-    <div class="fab-glow"></div>
-    <div class="fab-orb"></div>
+
+    <!-- Outer breathing halo -->
+    <div class="fab-halo"></div>
+
+    <!-- 4 expanding light waves (fade in/out) -->
+    <div class="fab-waves">
+      <div class="fab-wave"></div>
+      <div class="fab-wave"></div>
+      <div class="fab-wave"></div>
+      <div class="fab-wave"></div>
+    </div>
+
+    <!-- The Intelligence Orb -->
+    <div class="fab-orb">
+      <!-- Rotating thinking arc -->
+      <div class="fab-think"></div>
+
+      <!-- Orbiting micro-particles -->
+      <div class="fab-particle"></div>
+      <div class="fab-particle"></div>
+
+      <!-- Flickering center spark -->
+      <div class="fab-spark"></div>
+    </div>
   </button>
 
   <!-- ============ PANEL ============ -->
@@ -494,11 +669,21 @@
     <!-- HEADER -->
     <header class="hdr">
       <div class="hdr-left">
-        <div class="hdr-av">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M12 3l1.5 4 4 1.5-4 1.5L12 14l-1.5-4-4-1.5 4-1.5L12 3z" fill="#00E5FF"/>
-            <path d="M18 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z" fill="#8B5CF6" opacity=".8"/>
-          </svg>
+        <!-- Intelligence Orb avatar (V513) -->
+        <div class="hdr-av hdr-av-orb">
+          <div class="hdr-orb-root">
+            <div class="hdr-orb-halo"></div>
+            <div class="hdr-orb-waves">
+              <div class="hdr-orb-wave"></div>
+              <div class="hdr-orb-wave"></div>
+              <div class="hdr-orb-wave"></div>
+              <div class="hdr-orb-wave"></div>
+            </div>
+            <div class="hdr-orb-core">
+              <div class="hdr-orb-think"></div>
+              <div class="hdr-orb-spark"></div>
+            </div>
+          </div>
         </div>
         <div class="hdr-meta">
           <div class="hdr-name">رؤى <span class="hdr-status">متصل</span></div>
