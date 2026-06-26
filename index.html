@@ -3,226 +3,805 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>رؤى — مساعد التداول</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<title>رؤى — مساعد التداول الذكي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg-0:#06080F;--bg-1:#0A0E1A;--bg-2:#0F1421;--bg-3:#141A2A;
-  --cyan:#00E5FF;--cyan-dim:rgba(0,229,255,.08);
-  --green:#22C55E;--red:#EF4444;--gold:#FFB800;--purple:#8B5CF6;
-  --text-1:#F0F4FA;--text-2:#A0AEC0;--text-3:#64748B;
-  --border:rgba(255,255,255,.06);--border-cyan:rgba(0,229,255,.15);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg-0);color:var(--text-1);font-family:'Cairo',sans-serif;min-height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  /* ============ DESIGN TOKENS ============ */
+  :root{
+    --bg-0:#06080F;
+    --bg-1:#0A0E1A;
+    --bg-2:#0F1421;
+    --bg-3:#141A2A;
 
-/* Ambient glow */
-body::before{content:'';position:fixed;top:30%;left:40%;width:400px;height:400px;background:radial-gradient(circle,rgba(0,229,255,.04),transparent 70%);pointer-events:none;z-index:0}
-body::after{content:'';position:fixed;bottom:10%;right:20%;width:300px;height:300px;background:radial-gradient(circle,rgba(139,92,246,.03),transparent 70%);pointer-events:none;z-index:0}
+    --cyan:#00E5FF;
+    --cyan-soft:rgba(0,229,255,.08);
+    --cyan-line:rgba(0,229,255,.14);
 
-/* ===== FAB ===== */
-.fab{position:fixed;bottom:28px;left:28px;width:56px;height:56px;border-radius:50%;background:var(--bg-1);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:100;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
-.fab-ring{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(from var(--angle,0deg),transparent 0%,var(--cyan) 25%,transparent 50%,var(--purple) 75%,transparent 100%);animation:rotate 6s linear infinite;opacity:.5}
-.fab-core{position:absolute;inset:3px;border-radius:50%;background:var(--bg-1);border:1px solid rgba(0,229,255,.2)}
-.fab-glow{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 20px rgba(0,229,255,.2);animation:pulse 2s ease-in-out infinite}
-.fab svg{position:relative;z-index:2}
-.fab-dot{position:absolute;top:3px;right:3px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--bg-1);z-index:3;box-shadow:0 0 6px rgba(34,197,94,.5)}
-.fab-dot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid var(--green);animation:ping 1.5s ease-out infinite;opacity:0}
-@property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
-@keyframes rotate{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{box-shadow:0 0 15px rgba(0,229,255,.15)}50%{box-shadow:0 0 25px rgba(0,229,255,.3)}}
-@keyframes ping{0%{transform:scale(1);opacity:.8}100%{transform:scale(2);opacity:0}}
-.fab.hidden{transform:scale(0) rotate(-180deg);opacity:0;pointer-events:none}
+    --green:#22C55E;
+    --red:#EF4444;
+    --gold:#FFB800;
+    --purple:#8B5CF6;
 
-/* ===== Panel ===== */
-.panel{position:relative;width:400px;max-width:calc(100vw - 32px);height:620px;max-height:calc(100vh - 100px);background:linear-gradient(180deg,rgba(10,14,26,.95),rgba(6,8,15,.98));backdrop-filter:blur(30px) saturate(1.5);border:1px solid var(--border);border-radius:24px;z-index:99;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.02),inset 0 1px 0 rgba(255,255,255,.04);transform:scale(0) translateY(40px);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
-.panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
-.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border-cyan),transparent)}
+    --text-1:#F0F4FA;
+    --text-2:#A0AEC0;
+    --text-3:#64748B;
 
-/* ===== Header ===== */
-.hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:relative}
-.hdr::after{content:'';position:absolute;bottom:0;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
-.hdr-l{display:flex;align-items:center;gap:12px}
-.hdr-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(139,92,246,.08));border:1px solid var(--border-cyan);display:flex;align-items:center;justify-content:center;position:relative}
-.hdr-av::before{content:'';position:absolute;inset:-1px;border-radius:50%;background:conic-gradient(from 0deg,var(--cyan),var(--purple),var(--cyan));opacity:.15;animation:rotate 8s linear infinite}
-.hdr-av svg{position:relative;z-index:1}
-.hdr-t{font-size:14px;font-weight:700;letter-spacing:-.2px}
-.hdr-s{font-size:10px;color:var(--green);display:flex;align-items:center;gap:5px;margin-top:2px}
-.hdr-s::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 4px var(--green)}
-.hdr-r{display:flex;gap:4px}
-.hdr-b{width:30px;height:30px;border-radius:8px;background:transparent;border:1px solid transparent;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.hdr-b:hover{background:var(--cyan-dim);border-color:var(--border-cyan);color:var(--cyan)}
+    --border:rgba(255,255,255,.06);
+    --border-soft:rgba(255,255,255,.04);
+  }
 
-/* ===== Messages ===== */
-.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.1) transparent}
-.msgs::-webkit-scrollbar{width:3px}
-.msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,.1);border-radius:2px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
 
-/* User msg */
-.m-u{max-width:80%;padding:10px 14px;background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(0,229,255,.06));border:1px solid rgba(0,229,255,.15);border-radius:4px 14px 14px 14px;align-self:flex-start;font-size:13px;color:var(--text-1);line-height:1.5}
+  body{
+    background:
+      radial-gradient(1200px 800px at 70% -10%, rgba(0,229,255,.05), transparent 60%),
+      radial-gradient(900px 700px at 10% 110%, rgba(139,92,246,.04), transparent 60%),
+      var(--bg-0);
+    color:var(--text-1);
+    font-family:'Cairo',system-ui,sans-serif;
+    min-height:100vh;
+    overflow:hidden;
+    position:relative;
+  }
 
-/* Assistant msg */
-.m-a{max-width:92%;padding:12px 16px;background:rgba(15,20,33,.5);border:1px solid var(--border);border-radius:14px 4px 14px 14px;align-self:flex-end;font-size:13px;color:var(--text-2);line-height:1.6;backdrop-filter:blur(8px)}
-.m-a strong{color:var(--text-1)}
-.m-a p{margin:4px 0}
-.m-a ul{margin:6px 0;padding-right:14px;list-style:none}
-.m-a li{margin:4px 0;padding-right:12px;position:relative}
-.m-a li::before{content:'';position:absolute;right:0;top:8px;width:4px;height:4px;border-radius:50%;background:var(--cyan);opacity:.5}
+  /* Subtle ambient grid */
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+    background-size:48px 48px;
+    mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
 
-/* Summary box */
-.sum{background:rgba(0,229,255,.03);border:1px solid var(--border-cyan);border-radius:10px;padding:10px 14px;margin-bottom:8px}
-.sum-t{font-size:11px;color:var(--cyan);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px}
-.sum-r{display:flex;justify-content:space-between;font-size:11px;margin:3px 0}
-.sum-r span:first-child{color:var(--text-3)}
-.sum-r span:last-child{color:var(--text-1);font-weight:600}
+  .stage{
+    position:relative;z-index:1;height:100vh;
+    display:flex;align-items:center;justify-content:center;
+  }
 
-/* Section badge */
-.sec{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;margin:10px 0 6px}
-.sec-1{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.12);color:var(--cyan)}
-.sec-2{background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.12);color:var(--green)}
-.sec-3{background:rgba(255,184,0,.06);border:1px solid rgba(255,184,0,.12);color:var(--gold)}
-.sec-4{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.12);color:var(--red)}
+  /* ============ FAB ============ */
+  .fab{
+    position:fixed;bottom:30px;left:30px;
+    width:56px;height:56px;border-radius:50%;
+    background:linear-gradient(135deg, rgba(0,229,255,.18), rgba(139,92,246,.12) 60%, rgba(10,14,26,.6));
+    border:1px solid rgba(0,229,255,.22);
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    z-index:100;
+    box-shadow:
+      0 8px 24px rgba(0,229,255,.18),
+      0 0 0 6px rgba(0,229,255,.03),
+      inset 0 1px 0 rgba(255,255,255,.08);
+    animation:fabPulse 3.2s ease-in-out infinite;
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .fab:hover{
+    transform:scale(1.07) translateY(-2px);
+    box-shadow:
+      0 12px 32px rgba(0,229,255,.32),
+      0 0 0 8px rgba(0,229,255,.05),
+      inset 0 1px 0 rgba(255,255,255,.12);
+  }
+  .fab:active{transform:scale(1.02)}
+  .fab svg{position:relative;z-index:2;display:block}
+  .fab.online{
+    position:absolute;top:4px;right:4px;
+    width:10px;height:10px;border-radius:50%;
+    background:var(--green);
+    border:2px solid var(--bg-0);
+    box-shadow:0 0 8px rgba(34,197,94,.6);
+    z-index:3;
+  }
+  @keyframes fabPulse{
+    0%,100%{box-shadow:0 8px 24px rgba(0,229,255,.14), 0 0 0 6px rgba(0,229,255,.03), inset 0 1px 0 rgba(255,255,255,.08)}
+    50%    {box-shadow:0 10px 30px rgba(0,229,255,.26), 0 0 0 10px rgba(0,229,255,.04), inset 0 1px 0 rgba(255,255,255,.12)}
+  }
+  .fab.hidden{transform:scale(0) rotate(-90deg);opacity:0;pointer-events:none}
 
-/* Tables */
-.tw{overflow-x:auto;margin:6px 0;border-radius:10px;border:1px solid var(--border)}
-.tw table{width:100%;border-collapse:collapse;font-size:10.5px}
-.tw thead{background:linear-gradient(180deg,rgba(0,229,255,.04),transparent)}
-.tw th{padding:7px 8px;text-align:right;color:var(--cyan);font-weight:600;white-space:nowrap;border-bottom:1px solid var(--border-cyan);text-transform:uppercase;font-size:9.5px;letter-spacing:.3px}
-.tw td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--text-2)}
-.tw tr:last-child td{border-bottom:none}
-.tw tr:hover{background:rgba(0,229,255,.02)}
-.g{color:var(--green)!important;font-weight:600}
-.r{color:var(--red)!important;font-weight:600}
-.y{color:var(--gold)!important}
-.tag{display:inline-block;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600}
-.tag-r{background:rgba(239,68,68,.1);color:var(--red)}
-.tag-g{background:rgba(34,197,94,.1);color:var(--green)}
-.tag-y{background:rgba(255,184,0,.1);color:var(--gold)}
+  /* ============ PANEL ============ */
+  .panel{
+    position:relative;
+    width:420px;max-width:calc(100vw - 32px);
+    height:660px;max-height:calc(100vh - 80px);
+    background:rgba(10,14,22,.95);
+    backdrop-filter:blur(24px) saturate(1.4);
+    -webkit-backdrop-filter:blur(24px) saturate(1.4);
+    border:1px solid var(--border);
+    border-radius:16px;
+    z-index:99;
+    display:flex;flex-direction:column;overflow:hidden;
+    padding:0;
+    box-shadow:
+      0 16px 48px rgba(0,0,0,.4),
+      0 0 60px rgba(0,229,255,.06),
+      inset 0 1px 0 rgba(255,255,255,.03);
+    transform:scale(.92) translateY(16px);opacity:0;pointer-events:none;
+    transform-origin:bottom left;
+    transition:transform .35s cubic-bezier(.34,1.4,.5,1), opacity .25s ease;
+  }
+  .panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:auto}
+  .panel::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent 5%,rgba(0,229,255,.25) 50%,transparent 95%);
+  }
 
-/* Risk */
-.risk{margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.04);border:1px solid rgba(239,68,68,.1);border-radius:8px;font-size:10px;color:var(--text-3);line-height:1.4}
+  /* ============ HEADER ============ */
+  .hdr{
+    padding:14px 16px 12px;
+    display:flex;align-items:center;justify-content:space-between;
+    background:transparent;
+    border-bottom:1px solid var(--border);
+    position:relative;
+    flex-shrink:0;
+  }
+  .hdr-left{display:flex;align-items:center;gap:10px;min-width:0}
+  .hdr-av{
+    width:32px;height:32px;border-radius:50%;
+    background:linear-gradient(135deg, rgba(0,229,255,.22), rgba(139,92,246,.12));
+    border:1px solid rgba(0,229,255,.18);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  .hdr-meta{min-width:0;line-height:1.2}
+  .hdr-name{font-size:13px;font-weight:700;color:var(--text-1);display:flex;align-items:center;gap:6px}
+  .hdr-sub{font-size:10.5px;color:var(--text-3);margin-top:2px;font-weight:500}
+  .hdr-status{
+    display:inline-flex;align-items:center;gap:4px;
+    color:var(--green);font-size:10px;font-weight:600;
+  }
+  .hdr-status::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.7);
+  }
+  .hdr-actions{display:flex;align-items:center;gap:2px}
+  .hdr-btn{
+    width:30px;height:30px;border-radius:8px;
+    border:none;background:transparent;color:var(--text-2);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .2s ease;
+  }
+  .hdr-btn:hover{background:rgba(255,255,255,.04);color:var(--text-1)}
+  .hdr-btn:active{transform:scale(.94)}
+  .hdr-btn.close:hover{background:rgba(239,68,68,.08);color:var(--red)}
 
-/* Action items */
-.act{background:rgba(15,20,33,.4);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin:4px 0}
-.act-t{font-size:11px;font-weight:700;margin-bottom:4px}
-.act-d{font-size:11px;color:var(--text-3);line-height:1.4}
+  /* ============ MESSAGES ============ */
+  .messages{
+    flex:1;overflow-y:auto;overflow-x:hidden;
+    padding:18px 16px 8px;
+    display:flex;flex-direction:column;gap:12px;
+    scroll-behavior:smooth;
+  }
+  .messages::-webkit-scrollbar{width:6px}
+  .messages::-webkit-scrollbar-track{background:transparent}
+  .messages::-webkit-scrollbar-thumb{background:rgba(255,255,255,.06);border-radius:3px}
+  .messages::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.1)}
 
-/* Typing */
-.typ{display:flex;gap:5px;padding:6px 0}
-.typ span{width:7px;height:7px;border-radius:50%;background:var(--cyan);animation:tp 1.2s infinite}
-.typ span:nth-child(2){animation-delay:.15s}
-.typ span:nth-child(3){animation-delay:.3s}
-@keyframes tp{0%,60%,100%{opacity:.2;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+  .msg{display:flex;flex-direction:column;max-width:100%;animation:msgIn .35s ease}
+  @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ===== Input ===== */
-.inp{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:rgba(6,8,15,.4)}
-.inp-w{flex:1;background:rgba(15,20,33,.5);border:1px solid var(--border);border-radius:12px;padding:8px 12px;transition:all .2s}
-.inp-w:focus-within{border-color:var(--border-cyan);background:rgba(15,20,33,.8)}
-.inp-w textarea{width:100%;background:none;border:none;outline:none;color:var(--text-1);font-size:13px;font-family:'Cairo',sans-serif;resize:none;min-height:20px;max-height:80px;line-height:1.4}
-.inp-w textarea::placeholder{color:var(--text-3)}
-.inp-s{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),#0EA5E9);border:none;color:var(--bg-0);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-.inp-s:hover{transform:scale(1.05);box-shadow:0 0 16px rgba(0,229,255,.3)}
-.inp-s:active{transform:scale(.95)}
+  .msg.user{align-items:flex-end}
+  .msg.assistant{align-items:stretch}
 
-@media(max-width:480px){.panel{width:100%;height:100vh;max-height:100vh;border-radius:0;border:none}.fab{bottom:20px;left:20px}}
+  .bubble{
+    font-size:13px;line-height:1.6;
+    padding:10px 14px;border-radius:12px;
+    max-width:100%;
+  }
+  .msg.user .bubble{
+    background:linear-gradient(135deg, rgba(0,229,255,.10), rgba(0,229,255,.04));
+    border:1px solid rgba(0,229,255,.10);
+    color:var(--text-1);
+    border-bottom-right-radius:4px;
+    max-width:80%;
+  }
+  .msg.assistant .bubble{
+    background:rgba(15,20,33,.4);
+    border:1px solid var(--border);
+    color:var(--text-1);
+    border-top-left-radius:4px;
+  }
+  .msg-time{font-size:10px;color:var(--text-3);margin-top:4px;padding:0 4px;font-weight:500}
+
+  /* ============ ASSISTANT CONTENT ============ */
+  .ac{display:flex;flex-direction:column;gap:12px}
+  .ac p{margin:0}
+  .ac .lead{color:var(--text-1);font-weight:500}
+
+  /* Section badges */
+  .sec{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:6px;
+    font-size:11px;font-weight:700;
+    align-self:flex-start;
+    border:1px solid;
+  }
+  .sec .n{
+    width:16px;height:16px;border-radius:4px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:800;color:#fff;
+  }
+  .sec.cyan{color:var(--cyan);background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.18)}
+  .sec.cyan .n{background:rgba(0,229,255,.25)}
+  .sec.purple{color:var(--purple);background:rgba(139,92,246,.06);border-color:rgba(139,92,246,.18)}
+  .sec.purple .n{background:rgba(139,92,246,.3)}
+  .sec.gold{color:var(--gold);background:rgba(255,184,0,.06);border-color:rgba(255,184,0,.18)}
+  .sec.gold .n{background:rgba(255,184,0,.3)}
+  .sec.green{color:var(--green);background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.18)}
+  .sec.green .n{background:rgba(34,197,94,.3)}
+  .sec.red{color:var(--red);background:rgba(239,68,68,.06);border-color:rgba(239,68,68,.18)}
+  .sec.red .n{background:rgba(239,68,68,.3)}
+
+  /* Summary card */
+  .summary{
+    display:grid;grid-template-columns:1fr 1fr;gap:8px;
+    padding:12px;border-radius:10px;
+    background:rgba(15,20,33,.5);
+    border:1px solid var(--border);
+  }
+  .summary .item{display:flex;flex-direction:column;gap:3px}
+  .summary .lbl{font-size:10.5px;color:var(--text-3);font-weight:500}
+  .summary .val{font-size:15px;font-weight:700;color:var(--text-1);font-variant-numeric:tabular-nums}
+  .summary .val.pos{color:var(--green)}
+  .summary .val.neg{color:var(--red)}
+  .summary .val.cyan{color:var(--cyan)}
+
+  /* Table */
+  .tbl-wrap{border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+  table.tbl{
+    width:100%;border-collapse:collapse;
+    font-size:12px;font-variant-numeric:tabular-nums;
+  }
+  table.tbl th{
+    background:rgba(0,229,255,.04);
+    color:var(--cyan);font-weight:600;
+    padding:8px;text-align:right;
+    font-size:11px;
+  }
+  table.tbl td{
+    padding:7px 8px;
+    border-bottom:1px solid rgba(255,255,255,.03);
+    color:var(--text-2);
+  }
+  table.tbl tbody tr:nth-child(even){background:rgba(255,255,255,.01)}
+  table.tbl tbody tr:last-child td{border-bottom:none}
+  table.tbl tbody tr:hover{background:rgba(0,229,255,.03)}
+  table.tbl .sym{font-weight:700;color:var(--text-1);font-size:12px}
+  table.tbl .pos{color:var(--green);font-weight:600}
+  table.tbl .neg{color:var(--red);font-weight:600}
+  table.tbl .neu{color:var(--text-2)}
+  .pill{
+    display:inline-block;padding:2px 8px;border-radius:10px;
+    font-size:10px;font-weight:600;
+  }
+  .pill.long{background:rgba(34,197,94,.12);color:var(--green)}
+  .pill.short{background:rgba(239,68,68,.12);color:var(--red)}
+  .pill.watch{background:rgba(255,184,0,.12);color:var(--gold)}
+
+  /* Technical analysis list */
+  .ta-list{display:flex;flex-direction:column;gap:8px}
+  .ta-item{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:8px 10px;border-radius:8px;
+    background:rgba(15,20,33,.3);
+    border:1px solid var(--border-soft);
+  }
+  .ta-icon{
+    width:22px;height:22px;border-radius:6px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(0,229,255,.08);
+  }
+  .ta-item.bull .ta-icon{background:rgba(34,197,94,.1)}
+  .ta-item.bear .ta-icon{background:rgba(239,68,68,.1)}
+  .ta-item.neutral .ta-icon{background:rgba(255,184,0,.1)}
+  .ta-body{flex:1;min-width:0}
+  .ta-title{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:2px}
+  .ta-desc{font-size:11px;color:var(--text-2);line-height:1.5}
+  .ta-tag{
+    display:inline-block;margin-top:4px;
+    padding:1px 6px;border-radius:4px;
+    font-size:9.5px;font-weight:700;
+  }
+  .ta-tag.bull{background:rgba(34,197,94,.12);color:var(--green)}
+  .ta-tag.bear{background:rgba(239,68,68,.12);color:var(--red)}
+  .ta-tag.neutral{background:rgba(255,184,0,.12);color:var(--gold)}
+
+  /* Action boxes */
+  .actions{display:flex;flex-direction:column;gap:8px}
+  .action{
+    padding:10px 12px;border-radius:8px;
+    background:rgba(15,20,33,.3);
+    border:1px solid var(--border-soft);
+    border-left:3px solid var(--cyan);
+    display:flex;gap:10px;align-items:flex-start;
+  }
+  .action.urgent{border-left-color:var(--red)}
+  .action.profit{border-left-color:var(--green)}
+  .action.watch{border-left-color:var(--gold)}
+  .action-ic{
+    width:24px;height:24px;border-radius:6px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.03);
+  }
+  .action.urgent .action-ic{background:rgba(239,68,68,.1)}
+  .action.profit .action-ic{background:rgba(34,197,94,.1)}
+  .action.watch .action-ic{background:rgba(255,184,0,.1)}
+  .action-body{flex:1;min-width:0}
+  .action-h{
+    font-size:12px;font-weight:700;color:var(--text-1);
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    margin-bottom:3px;
+  }
+  .action-h .when{
+    font-size:9.5px;font-weight:600;color:var(--text-3);
+    padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.03);
+  }
+  .action-d{font-size:11px;color:var(--text-2);line-height:1.5}
+
+  /* Alerts */
+  .alert{
+    display:flex;gap:10px;align-items:flex-start;
+    padding:9px 11px;border-radius:8px;
+    background:rgba(15,20,33,.3);
+    border:1px solid var(--border-soft);
+  }
+  .alert.warn{border-left:3px solid var(--gold);padding-right:11px}
+  .alert.info{border-left:3px solid var(--cyan);padding-right:11px}
+  .alert-ic{flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+  .alert-body{flex:1;min-width:0}
+  .alert-t{font-size:11.5px;font-weight:600;color:var(--text-1);margin-bottom:2px}
+  .alert-d{font-size:11px;color:var(--text-2);line-height:1.5}
+
+  /* Risk notice */
+  .risk{
+    margin-top:4px;
+    padding:9px 11px;border-radius:8px;
+    background:rgba(239,68,68,.04);
+    border:1px solid rgba(239,68,68,.10);
+    display:flex;gap:8px;align-items:flex-start;
+  }
+  .risk-ic{flex-shrink:0;color:var(--red);opacity:.8}
+  .risk-d{font-size:10.5px;color:var(--text-3);line-height:1.5}
+
+  /* ============ TYPING ============ */
+  .typing{display:flex;align-items:center;gap:10px;padding:0 4px}
+  .typing-dots{display:flex;gap:4px}
+  .typing-dots span{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--cyan);opacity:.4;
+    animation:typing 1.4s ease-in-out infinite;
+  }
+  .typing-dots span:nth-child(2){animation-delay:.2s}
+  .typing-dots span:nth-child(3){animation-delay:.4s}
+  .typing-lbl{font-size:11px;color:var(--text-3);font-weight:500}
+  @keyframes typing{
+    0%,60%,100%{opacity:.4;transform:translateY(0)}
+    30%{opacity:1;transform:translateY(-3px)}
+  }
+
+  /* ============ INPUT ============ */
+  .input-area{
+    padding:10px 12px 12px;
+    border-top:1px solid var(--border);
+    background:transparent;
+    flex-shrink:0;
+  }
+  .input-row{display:flex;align-items:flex-end;gap:8px}
+  .ta{
+    flex:1;min-height:40px;max-height:120px;
+    background:rgba(15,20,33,.4);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:10px 12px;
+    color:var(--text-1);font-family:inherit;font-size:13px;line-height:1.5;
+    resize:none;outline:none;
+    transition:border-color .2s ease, background .2s ease;
+  }
+  .ta::placeholder{color:var(--text-3)}
+  .ta:focus{border-color:rgba(0,229,255,.35);background:rgba(15,20,33,.6)}
+  .send{
+    width:36px;height:36px;border-radius:50%;
+    border:none;cursor:pointer;
+    background:linear-gradient(135deg, #00E5FF 0%, #0891B2 100%);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+    transition:transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+    box-shadow:0 4px 12px rgba(0,229,255,.25);
+  }
+  .send:hover{transform:scale(1.08);box-shadow:0 6px 16px rgba(0,229,255,.35)}
+  .send:active{transform:scale(.96)}
+  .send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+  /* Hint */
+  .quick-hints{
+    display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;
+  }
+  .quick-hint{
+    padding:5px 10px;border-radius:14px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--border);
+    color:var(--text-2);
+    font-size:10.5px;font-weight:500;
+    cursor:pointer;transition:all .2s ease;
+  }
+  .quick-hint:hover{
+    background:rgba(0,229,255,.06);
+    border-color:rgba(0,229,255,.18);
+    color:var(--cyan);
+  }
+
+  /* Demo footer label */
+  .demo-tag{
+    position:fixed;top:18px;right:18px;
+    font-size:10px;color:var(--text-3);
+    padding:4px 10px;border-radius:12px;
+    background:rgba(15,20,33,.6);
+    border:1px solid var(--border);
+    backdrop-filter:blur(8px);
+    z-index:50;font-weight:500;
+    display:flex;align-items:center;gap:6px;
+  }
+  .demo-tag::before{
+    content:'';width:5px;height:5px;border-radius:50%;
+    background:var(--cyan);box-shadow:0 0 6px var(--cyan);
+  }
 </style>
 </head>
 <body>
+<div class="demo-tag">نموذج تصميم — رؤى v2</div>
 
-<div class="fab" id="fab" onclick="toggle()">
-  <div class="fab-glow"></div>
-  <div class="fab-ring"></div>
-  <div class="fab-core"></div>
-  <div class="fab-dot"></div>
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5" stroke-linecap="round">
-    <path d="M9.5 2A4.5 4.5 0 0 0 5 6.5v.5a3 3 0 0 0-2 2.83V12a3 3 0 0 0 3 3v.5A4.5 4.5 0 0 0 9.5 20h5A4.5 4.5 0 0 0 19 15.5V15a3 3 0 0 0 3-3V9.33A3 3 0 0 0 20 7v-.5A4.5 4.5 0 0 0 15.5 2h-6z"/>
-    <path d="M8 18v1a4 4 0 0 0 8 0v-1"/>
-    <circle cx="9" cy="10" r="1" fill="#00E5FF"/>
-    <circle cx="15" cy="10" r="1" fill="#00E5FF"/>
-  </svg>
-</div>
+<div class="stage">
 
-<div class="panel" id="panel">
-  <div class="hdr">
-    <div class="hdr-l">
-      <div class="hdr-av">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5"><path d="M9.5 2A4.5 4.5 0 0 0 5 6.5v.5a3 3 0 0 0-2 2.83V12a3 3 0 0 0 3 3v.5A4.5 4.5 0 0 0 9.5 20h5A4.5 4.5 0 0 0 19 15.5V15a3 3 0 0 0 3-3V9.33A3 3 0 0 0 20 7v-.5A4.5 4.5 0 0 0 15.5 2h-6z"/></svg>
+  <!-- ============ FAB ============ -->
+  <button class="fab" id="fab" aria-label="فتح المساعد">
+    <span class="online"></span>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id="sparkGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#00E5FF"/>
+          <stop offset="1" stop-color="#8B5CF6"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 2.5l1.7 4.6 4.6 1.7-4.6 1.7L12 15.1l-1.7-4.6L5.7 8.8l4.6-1.7L12 2.5z" fill="url(#sparkGrad)"/>
+      <path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" fill="url(#sparkGrad)" opacity=".85"/>
+      <circle cx="6" cy="17" r="1.4" fill="#00E5FF" opacity=".7"/>
+    </svg>
+  </button>
+
+  <!-- ============ PANEL ============ -->
+  <div class="panel" id="panel">
+
+    <!-- HEADER -->
+    <header class="hdr">
+      <div class="hdr-left">
+        <div class="hdr-av">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3l1.5 4 4 1.5-4 1.5L12 14l-1.5-4-4-1.5 4-1.5L12 3z" fill="#00E5FF"/>
+            <path d="M18 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8.8-2z" fill="#8B5CF6" opacity=".8"/>
+          </svg>
+        </div>
+        <div class="hdr-meta">
+          <div class="hdr-name">رؤى <span class="hdr-status">متصل</span></div>
+          <div class="hdr-sub">مساعد التداول الذكي</div>
+        </div>
       </div>
-      <div>
-        <div class="hdr-t">رؤى</div>
-        <div class="hdr-s">متصل · مساعد التداول</div>
+      <div class="hdr-actions">
+        <button class="hdr-btn" title="محادثة جديدة" aria-label="محادثة جديدة">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+        </button>
+        <button class="hdr-btn" title="السجل" aria-label="السجل">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M12 8v4l3 2"/>
+          </svg>
+        </button>
+        <button class="hdr-btn close" id="closeBtn" title="إغلاق" aria-label="إغلاق">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- MESSAGES -->
+    <div class="messages" id="messages">
+
+      <!-- User message -->
+      <div class="msg user">
+        <div class="bubble">حلل لي المحفظة وأعطني خطة تنفيذ للصفقات المفتوحة</div>
+        <div class="msg-time">10:42 ص</div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="typing" id="typing" style="display:none">
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+        <div class="typing-lbl">رؤى يكتب...</div>
+      </div>
+
+      <!-- Assistant message -->
+      <div class="msg assistant">
+        <div class="bubble">
+          <div class="ac">
+
+            <p class="lead">تم تحليل محفظتك. لديك <strong style="color:var(--cyan)">5 صفقات مفتوحة</strong> بإجمالي ربح غير محقق <strong style="color:var(--green)">+13.85$</strong> — الأداء العام إيجابي مع نقاط تحتاج مراقبة.</p>
+
+            <!-- Section 1: Summary -->
+            <div class="sec cyan"><span class="n">1</span> ملخص المحفظة</div>
+            <div class="summary">
+              <div class="item"><span class="lbl">الصفقات المفتوحة</span><span class="val cyan">5</span></div>
+              <div class="item"><span class="lbl">إجمالي PnL</span><span class="val pos">+13.85$</span></div>
+              <div class="item"><span class="lbl">نسبة الفوز</span><span class="val pos">60%</span></div>
+              <div class="item"><span class="lbl">الهامش المستخدم</span><span class="val">428.50$</span></div>
+            </div>
+
+            <!-- Section 2: Positions table -->
+            <div class="sec purple"><span class="n">2</span> الصفقات المفتوحة</div>
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th>الأصل</th><th>النوع</th><th>الدخول</th><th>السعر</th><th>PnL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="sym">ADA</td>
+                    <td><span class="pill long">شراء</span></td>
+                    <td>0.5820</td>
+                    <td>0.5945</td>
+                    <td class="pos">+8.42$</td>
+                  </tr>
+                  <tr>
+                    <td class="sym">BTC</td>
+                    <td><span class="pill long">شراء</span></td>
+                    <td>67,240</td>
+                    <td>67,815</td>
+                    <td class="pos">+5.18$</td>
+                  </tr>
+                  <tr>
+                    <td class="sym">SOL</td>
+                    <td><span class="pill short">بيع</span></td>
+                    <td>168.40</td>
+                    <td>165.10</td>
+                    <td class="pos">+4.65$</td>
+                  </tr>
+                  <tr>
+                    <td class="sym">DOGE</td>
+                    <td><span class="pill long">شراء</span></td>
+                    <td>0.1245</td>
+                    <td>0.1218</td>
+                    <td class="neg">−2.30$</td>
+                  </tr>
+                  <tr>
+                    <td class="sym">GBP/USD</td>
+                    <td><span class="pill watch">مراقبة</span></td>
+                    <td>1.2685</td>
+                    <td>1.2712</td>
+                    <td class="neu">−2.10$</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Section 3: Technical analysis -->
+            <div class="sec gold"><span class="n">3</span> التحليل الفني</div>
+            <div class="ta-list">
+              <div class="ta-item bull">
+                <div class="ta-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h7v7"/></svg>
+                </div>
+                <div class="ta-body">
+                  <div class="ta-title">ADA — اختراق مقاومة 0.5900</div>
+                  <div class="ta-desc">حجم تداول مرتفع + تقاطع EMA50 فوق EMA200 على إطار 4 ساعات.</div>
+                  <span class="ta-tag bull">صعودي قوي</span>
+                </div>
+              </div>
+              <div class="ta-item bull">
+                <div class="ta-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h7v7"/></svg>
+                </div>
+                <div class="ta-body">
+                  <div class="ta-title">BTC — ثبات فوق 67,500</div>
+                  <div class="ta-desc">المؤشر RSI عند 62 مع زخم إيجابي مستمر، الدعم التالي 66,800.</div>
+                  <span class="ta-tag bull">صعودي معتدل</span>
+                </div>
+              </div>
+              <div class="ta-item bear">
+                <div class="ta-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 7 7"/><path d="M14 16h7v-7"/></svg>
+                </div>
+                <div class="ta-body">
+                  <div class="ta-title">DOGE — ضعف تحت 0.1250</div>
+                  <div class="ta-desc">تكوين مثلث هابط على إطار ساعة، هدف 0.1180 إذا كسر 0.1210.</div>
+                  <span class="ta-tag bear">هبوطي محتمل</span>
+                </div>
+              </div>
+              <div class="ta-item neutral">
+                <div class="ta-icon">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+                </div>
+                <div class="ta-body">
+                  <div class="ta-title">GBP/USD — تذبذب عرضي</div>
+                  <div class="ta-desc">تجميع بين 1.2680 و 1.2720، بانتظار محفز من بيانات التضخم البريطانية.</div>
+                  <span class="ta-tag neutral">محايد</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 4: Execution plan -->
+            <div class="sec green"><span class="n">4</span> خطة التنفيذ</div>
+            <div class="actions">
+              <div class="action urgent">
+                <div class="action-ic">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+                </div>
+                <div class="action-body">
+                  <div class="action-h">إغلاق صفقة DOGE <span class="when">عاجل</span></div>
+                  <div class="action-d">وقف الخسارة الفعلي على 0.1210 — الخروج فورًا قبل تمديد الخسارة. تأكد من تنفيذ الأمر قبل افتتاح الجلسة الأمريكية.</div>
+                </div>
+              </div>
+              <div class="action profit">
+                <div class="action-ic">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div class="action-body">
+                  <div class="action-h">جني أرباح ADA جزئي <span class="when">50% عند 0.6050</span></div>
+                  <div class="action-d">أغلق نصف الكمية عند 0.6050 وانقل وقف الخسارة إلى نقطة الدخول. حافظ على الباقي بهدف 0.6250.</div>
+                </div>
+              </div>
+              <div class="action watch">
+                <div class="action-ic">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </div>
+                <div class="action-body">
+                  <div class="action-h">مراقبة GBP/USD <span class="when">بانتظار الاختراق</span></div>
+                  <div class="action-d">دخول شراء عند كسر 1.2720 مع وقف 1.2685 وهدف 1.2780. لا تتسرع قبل تأكيد الشمعة اليومية.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section 5: Alerts -->
+            <div class="sec red"><span class="n">5</span> التنبيهات</div>
+            <div class="alert warn">
+              <div class="alert-ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <div class="alert-body">
+                <div class="alert-t">حدث اقتصادي — بيانات التضخم الأمريكية</div>
+                <div class="alert-d">صدور CPI اليوم الساعة 3:30 م — توقع تذبذب حاد في BTC و GBP/USD.</div>
+              </div>
+            </div>
+            <div class="alert info">
+              <div class="alert-ic">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+              </div>
+              <div class="alert-body">
+                <div class="alert-t">صفقة ADA وصلت هدف 0.5945</div>
+                <div class="alert-d">تم تسجيل السعر المستهدف للمرحلة الأولى — راجع خطة جني الأرباح.</div>
+              </div>
+            </div>
+
+            <!-- Risk notice -->
+            <div class="risk">
+              <div class="risk-ic">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7v6c0 5 4 9 10 9s10-4 10-9V7l-10-5z"/></svg>
+              </div>
+              <div class="risk-d">تنبيه مخاطر: التداول في الأسواق المالية ينطوي على مخاطر عالية وقد يؤدي إلى خسارة رأس المال. التحليلات أعلاه لأغراض تعليمية وليست توصية استثمارية مباشرة.</div>
+            </div>
+
+          </div>
+        </div>
+        <div class="msg-time">10:43 ص</div>
+      </div>
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-area">
+      <div class="input-row">
+        <textarea class="ta" id="ta" rows="1" placeholder="اكتب سؤالك أو طلب تحليل..."></textarea>
+        <button class="send" id="send" aria-label="إرسال">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06080F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="quick-hints">
+        <span class="quick-hint">حلل BTC</span>
+        <span class="quick-hint">اقترح وقف خسارة</span>
+        <span class="quick-hint">أخبار السوق</span>
       </div>
     </div>
-    <div class="hdr-r">
-      <button class="hdr-b" title="جديد"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button>
-      <button class="hdr-b" title="السجل"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg></button>
-      <button class="hdr-b" onclick="toggle()" title="إغلاق"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
-    </div>
-  </div>
 
-  <div class="msgs" id="msgs">
-    <div class="m-u">حلل صفقاتي المفتوحة</div>
-    <div class="m-a">
-      <div class="sum">
-        <div class="sum-t">📊 ملخص المحفظة</div>
-        <div class="sum-r"><span>عدد الصفقات</span><span>5 (4 Short + 1 Long)</span></div>
-        <div class="sum-r"><span>PnL الإجمالي</span><span style="color:var(--green)">+13.85$</span></div>
-        <div class="sum-r"><span>أكبر مخاطرة</span><span style="color:var(--red)">ADA/USDT (قرب SL)</span></div>
-        <div class="sum-r"><span>التعرض</span><span>80% كريبتو Short</span></div>
-      </div>
-
-      <div class="sec sec-1">1️⃣ جدول الصفقات</div>
-      <div class="tw"><table>
-        <thead><tr><th>الأصل</th><th>النوع</th><th>الدخول</th><th>الحالي</th><th>PnL</th><th>الأولوية</th></tr></thead>
-        <tbody>
-          <tr><td>ADA/USDT</td><td>SELL</td><td>0.1493</td><td>0.1490</td><td class="g">+2.16$</td><td><span class="tag tag-r">عاجل</span></td></tr>
-          <tr><td>BTC/USDT</td><td>SELL</td><td>61,646</td><td>61,740</td><td class="r">-5.38$</td><td><span class="tag tag-r">عاجل</span></td></tr>
-          <tr><td>SOL/USDT</td><td>SELL</td><td>69.34</td><td>68.86</td><td class="g">+6.32$</td><td><span class="tag tag-g">جيد</span></td></tr>
-          <tr><td>DOGE/USDT</td><td>SELL</td><td>0.0773</td><td>0.0762</td><td class="g">+7.97$</td><td><span class="tag tag-g">جيد</span></td></tr>
-          <tr><td>GBP/USD</td><td>BUY</td><td>1.3170</td><td>1.3191</td><td class="g">+1.45$</td><td><span class="tag tag-y">راقب</span></td></tr>
-        </tbody>
-      </table></div>
-
-      <div class="sec sec-2">2️⃣ التحليل الفني</div>
-      <ul>
-        <li><strong>BTC:</strong> دعم 59,030 / مقاومة 67,248 — RSI: 36 (تحت MA50)</li>
-        <li><strong>SOL:</strong> دعم 60.41 / مقاومة 75.94 — RSI: 42 (هابط)</li>
-        <li><strong>DOGE:</strong> RSI: 24 (تشبع بيعي) — قرب TP مباشرة</li>
-        <li><strong>GBP/USD:</strong> فوق MA50 — MACD صاعد يدعم Long</li>
-      </ul>
-
-      <div class="sec sec-3">3️⃣ خطة التنفيذ</div>
-      <div class="act">
-        <div class="act-t" style="color:var(--red)">🔴 إجراءات عاجلة</div>
-        <div class="act-d"><strong>ADA:</strong> إغلاق فوري أو تعديل SL إلى 0.1495<br><strong>BTC:</strong> تعديل SL إلى 61,900 — حماية رأس المال</div>
-      </div>
-      <div class="act">
-        <div class="act-t" style="color:var(--green)">🟢 جني أرباح</div>
-        <div class="act-d"><strong>SOL:</strong> أغلق 40% عند 68.50 + انقل SL إلى 69.00<br><strong>DOGE:</strong> أغلق 50% الآن + انقل SL إلى 0.0773</div>
-      </div>
-      <div class="act">
-        <div class="act-t" style="color:var(--gold)">🟡 مراقبة</div>
-        <div class="act-d"><strong>GBP/USD:</strong> احتفظ — هدف TP 1.424</div>
-      </div>
-
-      <div class="sec sec-4">4️⃣ تنبيهات فورية</div>
-      <p>⚠️ <strong>ADA/USDT</strong> — مسافة SL 0.0014$ فقط — تحرك فوري</p>
-      <p>⚠️ <strong>BTC/USDT</strong> — السعر يقترب من SL 62,024</p>
-
-      <div class="risk">⚠️ المعلومات لأغراض تعليمية فقط ولا تعتبر نصيحة استثمارية. استشر مستشاراً مالياً مؤهلاً قبل اتخاذ أي قرار تداول.</div>
-    </div>
-  </div>
-
-  <div class="inp">
-    <div class="inp-w"><textarea placeholder="اكتب رسالتك..." rows="1" id="ti"></textarea></div>
-    <button class="inp-s" onclick="send()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button>
   </div>
 </div>
 
 <script>
-function toggle(){const p=document.getElementById('panel'),f=document.getElementById('fab');p.classList.toggle('open');f.classList.toggle('hidden')}
-function send(){const t=document.getElementById('ti'),v=t.value.trim();if(!v)return;const m=document.getElementById('msgs');const u=document.createElement('div');u.className='m-u';u.textContent=v;m.appendChild(u);t.value='';const a=document.createElement('div');a.className='m-a';a.innerHTML='<div class="typ"><span></span><span></span><span></span></div>';m.appendChild(a);m.scrollTop=m.scrollHeight;setTimeout(()=>{a.innerHTML='<p>تم استلام سؤالك. جاري التحليل...</p>';m.scrollTop=m.scrollHeight},1200)}
-document.getElementById('ti').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+  const fab = document.getElementById('fab');
+  const panel = document.getElementById('panel');
+  const closeBtn = document.getElementById('closeBtn');
+  const ta = document.getElementById('ta');
+  const send = document.getElementById('send');
+  const messages = document.getElementById('messages');
+  const typing = document.getElementById('typing');
+
+  function openPanel(){
+    panel.classList.add('open');
+    fab.classList.add('hidden');
+    setTimeout(()=>{ messages.scrollTop = messages.scrollHeight; }, 350);
+  }
+  function closePanel(){
+    panel.classList.remove('open');
+    setTimeout(()=>{ fab.classList.remove('hidden'); }, 150);
+  }
+
+  fab.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+
+  // Auto-grow textarea
+  ta.addEventListener('input', ()=>{
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+  });
+
+  // Send message
+  function sendMsg(){
+    const text = ta.value.trim();
+    if(!text) return;
+
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    const ampm = now.getHours() < 12 ? 'ص' : 'م';
+    userMsg.innerHTML = `<div class="bubble"></div><div class="msg-time">${hh}:${mm} ${ampm}</div>`;
+    userMsg.querySelector('.bubble').textContent = text;
+    messages.appendChild(userMsg);
+
+    ta.value = '';
+    ta.style.height = 'auto';
+    messages.scrollTop = messages.scrollHeight;
+
+    // Show typing
+    typing.style.display = 'flex';
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(()=>{
+      typing.style.display = 'none';
+      const aMsg = document.createElement('div');
+      aMsg.className = 'msg assistant';
+      aMsg.innerHTML = `<div class="bubble"><div class="ac"><p class="lead">جاري التحليل... هذا نموذج تفاعلي. في النسخة الكاملة ستحصل على تحليل شامل للمحفظة مع خطة تنفيذ مفصلة.</p></div></div><div class="msg-time">${hh}:${mm} ${ampm}</div>`;
+      messages.appendChild(aMsg);
+      messages.scrollTop = messages.scrollHeight;
+    }, 1400);
+  }
+
+  send.addEventListener('click', sendMsg);
+  ta.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      sendMsg();
+    }
+  });
+
+  // Quick hints
+  document.querySelectorAll('.quick-hint').forEach(h=>{
+    h.addEventListener('click', ()=>{
+      ta.value = h.textContent;
+      ta.focus();
+      ta.dispatchEvent(new Event('input'));
+    });
+  });
+
+  // Open panel by default for demo
+  setTimeout(openPanel, 400);
 </script>
 </body>
 </html>
