@@ -62,43 +62,67 @@
     display:flex;align-items:center;justify-content:center;
   }
 
-  /* ============ FAB ============ */
+  /* ============ FAB — Living Light Orb ============ */
   .fab{
     position:fixed;bottom:30px;left:30px;
     width:56px;height:56px;border-radius:50%;
-    background:linear-gradient(135deg, rgba(0,229,255,.18), rgba(139,92,246,.12) 60%, rgba(10,14,26,.6));
-    border:1px solid rgba(0,229,255,.22);
+    background:rgba(6,8,15,.7);
+    border:1px solid rgba(0,229,255,.15);
     cursor:pointer;display:flex;align-items:center;justify-content:center;
     z-index:100;
-    box-shadow:
-      0 8px 24px rgba(0,229,255,.18),
-      0 0 0 6px rgba(0,229,255,.03),
-      inset 0 1px 0 rgba(255,255,255,.08);
-    animation:fabPulse 3.2s ease-in-out infinite;
-    transition:transform .25s ease, box-shadow .25s ease;
+    transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+    overflow:visible;
   }
-  .fab:hover{
-    transform:scale(1.07) translateY(-2px);
-    box-shadow:
-      0 12px 32px rgba(0,229,255,.32),
-      0 0 0 8px rgba(0,229,255,.05),
-      inset 0 1px 0 rgba(255,255,255,.12);
+  .fab:hover{transform:scale(1.06)}
+  .fab:active{transform:scale(.98)}
+
+  /* Orb core — the living light */
+  .fab-orb{
+    position:absolute;inset:6px;border-radius:50%;
+    background:radial-gradient(circle at 40% 40%, rgba(0,229,255,.5), rgba(0,229,255,.1) 60%, transparent 80%);
+    animation:orbBreathe 3s ease-in-out infinite;
   }
-  .fab:active{transform:scale(1.02)}
-  .fab svg{position:relative;z-index:2;display:block}
+  @keyframes orbBreathe{
+    0%,100%{opacity:.5;transform:scale(.85);filter:blur(2px)}
+    50%{opacity:1;transform:scale(1.1);filter:blur(0px)}
+  }
+
+  /* Wave rings — expand outward like ripples */
+  .fab-wave{
+    position:absolute;inset:0;border-radius:50%;
+    border:1.5px solid rgba(0,229,255,.3);
+    animation:wave 3s ease-out infinite;
+    pointer-events:none;
+  }
+  .fab-wave:nth-child(2){animation-delay:1s}
+  .fab-wave:nth-child(3){animation-delay:2s}
+  @keyframes wave{
+    0%{transform:scale(.6);opacity:0;border-width:2px}
+    20%{opacity:.5}
+    100%{transform:scale(1.8);opacity:0;border-width:.5px}
+  }
+
+  /* Inner glow */
+  .fab-glow{
+    position:absolute;inset:0;border-radius:50%;
+    box-shadow:0 0 20px rgba(0,229,255,.15);
+    animation:glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{box-shadow:0 0 15px rgba(0,229,255,.1)}
+    50%{box-shadow:0 0 25px rgba(0,229,255,.25), 0 0 50px rgba(0,229,255,.08)}
+  }
+
+  /* Online dot */
   .fab.online{
-    position:absolute;top:4px;right:4px;
+    position:absolute;top:3px;right:3px;
     width:10px;height:10px;border-radius:50%;
     background:var(--green);
     border:2px solid var(--bg-0);
-    box-shadow:0 0 8px rgba(34,197,94,.6);
-    z-index:3;
+    box-shadow:0 0 6px rgba(34,197,94,.5);
+    z-index:5;
   }
-  @keyframes fabPulse{
-    0%,100%{box-shadow:0 8px 24px rgba(0,229,255,.14), 0 0 0 6px rgba(0,229,255,.03), inset 0 1px 0 rgba(255,255,255,.08)}
-    50%    {box-shadow:0 10px 30px rgba(0,229,255,.26), 0 0 0 10px rgba(0,229,255,.04), inset 0 1px 0 rgba(255,255,255,.12)}
-  }
-  .fab.hidden{transform:scale(0) rotate(-90deg);opacity:0;pointer-events:none}
+  .fab.hidden{transform:scale(0);opacity:0;pointer-events:none}
 
   /* ============ PANEL ============ */
   .panel{
@@ -457,17 +481,11 @@
   <!-- ============ FAB ============ -->
   <button class="fab" id="fab" aria-label="فتح المساعد">
     <span class="online"></span>
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-      <defs>
-        <linearGradient id="sparkGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#00E5FF"/>
-          <stop offset="1" stop-color="#8B5CF6"/>
-        </linearGradient>
-      </defs>
-      <path d="M12 2.5l1.7 4.6 4.6 1.7-4.6 1.7L12 15.1l-1.7-4.6L5.7 8.8l4.6-1.7L12 2.5z" fill="url(#sparkGrad)"/>
-      <path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" fill="url(#sparkGrad)" opacity=".85"/>
-      <circle cx="6" cy="17" r="1.4" fill="#00E5FF" opacity=".7"/>
-    </svg>
+    <div class="fab-wave"></div>
+    <div class="fab-wave"></div>
+    <div class="fab-wave"></div>
+    <div class="fab-glow"></div>
+    <div class="fab-orb"></div>
   </button>
 
   <!-- ============ PANEL ============ -->
