@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رؤى — مساعد التداول الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',system-ui,sans-serif}
+body{background:#0B0E14;color:#E8EDF5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+
+/* ===== FAB ===== */
+.fab{position:fixed;bottom:24px;left:24px;width:60px;height:60px;border-radius:50%;background:rgba(5,8,16,.9);border:1px solid rgba(0,229,255,.3);backdrop-filter:blur(20px);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:9999;box-shadow:0 0 20px rgba(0,229,255,.3);transition:all .3s ease}
+.fab:hover{transform:scale(1.08);box-shadow:0 0 30px rgba(0,229,255,.5)}
+.fab::before{content:'';position:absolute;inset:-2px;border-radius:50%;background:conic-gradient(from 0deg,#00E5FF,#22C55E,#8B5CF6,#00E5FF);animation:spin 4s linear infinite;z-index:-1;opacity:.6}
+.fab::after{content:'';position:absolute;inset:2px;border-radius:50%;background:rgba(5,8,16,.95)}
+.fab svg{position:relative;z-index:1}
+.fab-online{position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:#22C55E;border:2px solid #050810;z-index:2;box-shadow:0 0 6px rgba(34,197,94,.6)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===== Panel ===== */
+.panel{width:420px;max-width:100%;height:640px;max-height:90vh;background:rgba(8,12,22,.92);backdrop-filter:blur(22px) saturate(1.4);border:1px solid rgba(0,229,255,.12);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 40px rgba(0,229,255,.06);display:flex;flex-direction:column;overflow:hidden;animation:openPanel .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes openPanel{from{opacity:0;transform:scale(.9) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ===== Header ===== */
+.header{padding:14px 18px;background:linear-gradient(135deg,rgba(0,229,255,.08),rgba(139,92,246,.04));border-bottom:1px solid rgba(0,229,255,.1);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-info{display:flex;align-items:center;gap:10px}
+.header-avatar{width:36px;height:36px;border-radius:50%;background:rgba(0,229,255,.15);display:flex;align-items:center;justify-content:center;border:1px solid rgba(0,229,255,.2)}
+.header-title{font-size:14px;font-weight:700;color:#E8EDF5}
+.header-subtitle{font-size:11px;color:#8A9DB2}
+.header-status{display:flex;align-items:center;gap:4px;font-size:10px;color:#22C55E}
+.header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:#22C55E;box-shadow:0 0 4px rgba(34,197,94,.6)}
+.header-actions{display:flex;gap:6px}
+.header-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#B0C4D8;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.header-btn:hover{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.2);color:#00E5FF}
+
+/* ===== Messages ===== */
+.messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:rgba(0,229,255,.15) transparent}
+.messages::-webkit-scrollbar{width:4px}
+.messages::-webkit-scrollbar-thumb{background:rgba(0,229,255,.15);border-radius:2px}
+.msg{max-width:90%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.msg-user{background:linear-gradient(135deg,#059669,#047857);color:#fff;align-self:flex-start;border-radius:4px 14px 14px 14px}
+.msg-assistant{background:rgba(15,22,36,.7);border:1px solid rgba(0,229,255,.08);color:#D1D5DB;align-self:flex-end;border-radius:14px 4px 14px 14px;backdrop-filter:blur(8px)}
+
+/* ===== Section Badges ===== */
+.section-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:700;margin:8px 0 6px}
+.badge-1{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);color:#00E5FF}
+.badge-2{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#22C55E}
+.badge-3{background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.2);color:#FFB800}
+.badge-4{background:rgba(239,83,80,.1);border:1px solid rgba(239,83,80,.2);color:#EF5350}
+.badge-5{background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:#8B5CF6}
+
+/* ===== Tables ===== */
+.table-wrap{overflow-x:auto;margin:8px 0;border-radius:8px;border:1px solid rgba(0,229,255,.1)}
+table{width:100%;border-collapse:collapse;font-size:11px;background:rgba(12,18,32,.6)}
+thead{background:rgba(0,229,255,.06)}
+th{padding:6px 8px;text-align:right;color:#00E5FF;font-weight:600;white-space:nowrap;border-bottom:1px solid rgba(0,229,255,.15)}
+td{padding:5px 8px;text-align:right;border-bottom:1px solid rgba(255,255,255,.04);color:#B0C4D8}
+tr:nth-child(even){background:rgba(255,255,255,.015)}
+td.green{color:#22C55E;font-weight:600}
+td.red{color:#EF5350;font-weight:600}
+td.yellow{color:#FFB800}
+
+/* ===== Lists ===== */
+.msg-assistant ul{margin:6px 0;padding-right:16px}
+.msg-assistant li{margin:3px 0;color:#D1D5DB}
+.msg-assistant strong{color:#E8EDF5;font-weight:700}
+.msg-assistant p{margin:4px 0}
+
+/* ===== Risk Note ===== */
+.risk-note{margin-top:10px;padding:8px 12px;background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.15);border-radius:8px;font-size:10px;color:#EF5350;display:flex;align-items:flex-start;gap:6px}
+
+/* ===== Typing Indicator ===== */
+.typing{display:flex;gap:4px;padding:8px 14px}
+.typing span{width:6px;height:6px;border-radius:50%;background:#00E5FF;animation:bounce 1.4s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* ===== Input ===== */
+.input-area{padding:12px;background:rgba(8,12,22,.6);border-top:1px solid rgba(0,229,255,.08);display:flex;gap:8px;align-items:flex-end}
+.input-area textarea{flex:1;background:rgba(12,18,32,.6);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;color:#E8EDF5;font-size:13px;font-family:'Cairo',sans-serif;resize:none;outline:none;min-height:40px;max-height:100px;transition:border-color .2s}
+.input-area textarea:focus{border-color:rgba(0,229,255,.3)}
+.input-area textarea::placeholder{color:#4B5563}
+.send-btn{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#00E5FF,#0EA5E9);border:none;color:#050810;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.send-btn:hover{transform:scale(1.05);box-shadow:0 0 12px rgba(0,229,255,.4)}
+.send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+@media(max-width:480px){.panel{width:100%;height:100vh;max-height:100vh;border-radius:0}}
+</style>
+</head>
+<body>
+
+<!-- FAB -->
+<div class="fab" onclick="togglePanel()">
+  <div class="fab-online"></div>
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 2a4 4 0 0 0-4 4v1a3 3 0 0 0-1 5.83V14a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3v-1.17A3 3 0 0 0 16 7V6a4 4 0 0 0-4-4z"/>
+    <path d="M9 17v2a3 3 0 0 0 6 0v-2"/>
+  </svg>
+</div>
+
+<!-- Panel -->
+<div class="panel" id="panel" style="display:none">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-info">
+      <div class="header-avatar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00E5FF" stroke-width="1.5"><path d="M12 2a4 4 0 0 0-4 4v1a3 3 0 0 0-1 5.83V14a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3v-1.17A3 3 0 0 0 16 7V6a4 4 0 0 0-4-4z"/></svg>
+      </div>
+      <div>
+        <div class="header-title">رؤى — مساعد التداول</div>
+        <div class="header-status">متصل</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" title="محادثة جديدة">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="header-btn" title="التاريخ">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </button>
+      <button class="header-btn" onclick="togglePanel()" title="إغلاق">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="messages">
+
+    <!-- User message -->
+    <div class="msg msg-user">حلل صفقاتي المفتوحة</div>
+
+    <!-- Assistant response -->
+    <div class="msg msg-assistant">
+      <p><strong>📊 ملخص المحفظة</strong></p>
+      <ul>
+        <li><strong>عدد الصفقات:</strong> 5 (4 Short كريبتو + 1 Long فوركس)</li>
+        <li><strong>PnL الإجمالي:</strong> <span style="color:#22C55E">+13.85$</span></li>
+        <li><strong>أكبر مخاطرة:</strong> ADA/USDT SELL (قرب SL)</li>
+      </ul>
+
+      <div class="section-badge badge-1">1️⃣ جدول الصفقات</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>الأصل</th><th>النوع</th><th>الدخول</th><th>الحالي</th><th>PnL</th><th>أولوية</th></tr></thead>
+          <tbody>
+            <tr><td>ADA/USDT</td><td>SELL</td><td>0.1493</td><td>0.1490</td><td class="green">+2.16$</td><td class="red">عالية</td></tr>
+            <tr><td>SOL/USDT</td><td>SELL</td><td>69.34</td><td>68.86</td><td class="green">+6.32$</td><td class="green">جيدة</td></tr>
+            <tr><td>DOGE/USDT</td><td>SELL</td><td>0.0773</td><td>0.0762</td><td class="green">+7.97$</td><td class="green">جيدة</td></tr>
+            <tr><td>BTC/USDT</td><td>SELL</td><td>61,646</td><td>61,740</td><td class="red">-5.38$</td><td class="red">عالية</td></tr>
+            <tr><td>GBP/USD</td><td>BUY</td><td>1.3170</td><td>1.3191</td><td class="green">+1.45$</td><td class="yellow">راقب</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-badge badge-2">2️⃣ التحليل الفني</div>
+      <ul>
+        <li><strong>BTC:</strong> دعم 59,030 / مقاومة 67,248 — RSI: 36 (تحت MA50)</li>
+        <li><strong>SOL:</strong> دعم 60.41 / مقاومة 75.94 — RSI: 42 (هابط)</li>
+        <li><strong>DOGE:</strong> RSI: 24 (تشبع بيعي) — قرب TP</li>
+        <li><strong>GBP/USD:</strong> فوق MA50 — MACD صاعد</li>
+      </ul>
+
+      <div class="section-badge badge-3">3️⃣ خطة التنفيذ</div>
+      <ul>
+        <li><strong style="color:#EF5350">🔴 ADA:</strong> إغلاق فوري أو تعديل SL — قرب SL</li>
+        <li><strong style="color:#22C55E">🟢 SOL/DOGE:</strong> أغلق 40% + انقل SL إلى Breakeven</li>
+        <li><strong style="color:#FFB800">🟡 BTC:</strong> راقب — إذا اخترق 62,000 أغلق</li>
+        <li><strong style="color:#22C55E">🟢 GBP/USD:</strong> احتفظ — هدف TP 1.424</li>
+      </ul>
+
+      <div class="section-badge badge-4">4️⃣ تنبيهات فورية</div>
+      <p>⚠️ <strong>ADA/USDT</strong> قريب من SL — تحرك سريع مطلوب</p>
+      <p>⚠️ <strong>BTC/USDT</strong> يقترب من SL 62,024</p>
+
+      <div class="risk-note">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        <span>المعلومات لأغراض تعليمية فقط ولا تعتبر نصيحة استثمارية. استشر مستشاراً مالياً قبل اتخاذ أي قرار.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <textarea placeholder="اكتب رسالتك..." rows="1" id="input"></textarea>
+    <button class="send-btn" onclick="sendMessage()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+function togglePanel(){const p=document.getElementById('panel');const f=document.querySelector('.fab');if(p.style.display==='none'){p.style.display='flex';f.style.display='none'}else{p.style.display='none';f.style.display='flex'}}
+function sendMessage(){const i=document.getElementById('input');const v=i.value.trim();if(!v)return;const m=document.getElementById('messages');const d=document.createElement('div');d.className='msg msg-user';d.textContent=v;m.appendChild(d);i.value='';const t=document.createElement('div');t.className='msg msg-assistant';t.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';m.appendChild(t);m.scrollTop=m.scrollHeight;setTimeout(()=>{t.innerHTML='<p>تم استلام سؤالك. جاري التحليل...</p>';m.scrollTop=m.scrollHeight},1200)}
+document.getElementById('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+</script>
+</body>
+</html>
